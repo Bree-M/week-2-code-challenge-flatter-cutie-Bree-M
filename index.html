@@ -2,48 +2,348 @@
   <head>
     <title>Flatacuties</title>
     <link rel="stylesheet" type="text/css" href="style.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #e7a15f;
+      }
+      .logo {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      #character-bar {
+        display: flex;
+        gap: 15px;
+        padding: 15px;
+        overflow-x: auto;
+        background: #f8f2f2;
+        border-radius: 8px;
+        margin-bottom: 30px;
+      }
+      .character-tab {
+        padding: 10px 20px;
+        background: #db3c0b;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.3s;
+      }
+      .character-tab:hover {
+        background: #da67ae;
+        transform: translateY(-2px);
+      }
+      #detailed-info {
+        padding: 25px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(231, 132, 178, 0.1);
+        margin-bottom: 30px;
+      }
+      #detailed-info img {
+        max-width: 300px;
+        height: auto;
+        border-radius: 8px;
+        margin-bottom: 15px;
+      }
+      #votes-form {
+        margin: 20px 0;
+      }
+      #votes-form input[type="number"] {
+        padding: 8px;
+        width: 100px;
+        margin-right: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      #votes-form input[type="submit"],
+      #reset-btn {
+        padding: 8px 15px;
+        background: #f57f3b;
+        color: rgb(163, 57, 57);
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      #reset-btn {
+        background: #f47c36;
+        margin-left: 10px;
+      }
+      #character-form {
+        background: #f8f8f8;
+        padding: 20px;
+        border-radius: 8px;
+      }
+      #character-form div {
+        margin-bottom: 15px;
+      }
+      #character-form label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      #character-form input[type="text"] {
+        padding: 8px;
+        width: 100%;
+        max-width: 400px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      #character-form input[type="submit"] {
+        padding: 10px 20px;
+        background: #f39121;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+    </style>
   </head>
   <body>
     <div class="logo">
-      <h1>Flatacuties</h1>
+      <h1>The Flatacuties</h1>
+      <h2>Vote for the Cutest Animal! 🐼🐵🦓🦁</h2>
     </div>
 
-    <div id="character-bar">
-      <!-- show characters names here -->
+    <div id="character-bar"></div>
+
+    <div id="detailed-info">
+      <p>Select a character to view details</p>
     </div>
 
-    <div class="characterInfo">
-      <div id="detailed-info">
-        <p id="name">Character's Name</p>
-        <img
-          id="image"
-          src="assets/dummy.gif"
-          alt="Character's Name"
-        /><!-- display character image here -->
-        <h4>Total Votes: <span id="vote-count">Character's Votes</span></h4>
-        <form id="votes-form">
-          <input type="text" placeholder="Enter Votes" id="votes" name="votes" />
-          <input type="submit" value="Add Votes" />
-        </form>
-        <button id="reset-btn">Reset Votes</button>
+    <h3>Add New Character</h3>
+    <form id="character-form">
+      <div>
+        <label for="name">Character Name</label>
+        <input type="text" id="name" name="name" required />
       </div>
+      <div>
+        <label for="image-url">Image URL</label>
+        <input type="text" id="image-url" name="image-url" required />
+      </div>
+      <input type="submit" value="Add Character" />
+    </form>
 
-      <!-- Bonus only! Uncomment the elements below when you are ready to work on the bonus deliverables -->
-      <!-- 
-        <h4>Add New Character</h4>
-        <form id="character-form">
-          <div>
-            <label for="name">Name</label>
-            <input type="text" id="name" name="name" />
-          </div>
-          <div>
-            <label for="image-url">Image URL</label>
-            <input type="text" id="image-url" name="image-url" />
-          </div>
-          <input type="submit" value="Add Character" />
-        </form> 
-      -->
-    </div>
-    <script src="src/index.js"></script>
+    <script>
+      const API_URL = 'http://localhost:3000';
+
+async function fetchCharacters() {
+  try {
+    const response = await fetch(`${API_URL}/characters`);
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching characters:", error);
+    return []; 
+  }
+}
+
+async function updateCharacterOnServer(character) {
+  try {
+    const response = await fetch(`${API_URL}/characters/${character.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ votes: character.votes })
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating character:", error);
+  }
+}
+
+async function saveCharacterToServer(character) {
+  try {
+    const response = await fetch(`${API_URL}/characters`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(character)
+    });
+    return await response.json();
+  } catch (error) {
+    console.error("Error saving character:", error);
+  }
+}
+      document.addEventListener('DOMContentLoaded', function() {
+        const characterBar = document.getElementById('character-bar');
+        const detailedInfo = document.getElementById('detailed-info');
+        const characterForm = document.getElementById('character-form');
+        
+        
+        let characters = [
+          {
+            id: 1,
+            name: "Mr. Cute",
+            image: "https://i.pinimg.com/originals/e1/43/92/e14392b3bb9f745025a5cf6a9abe11be.gif",
+            votes: 0
+          },
+          {
+            id: 2,
+            name: "Mx. Monkey",
+            image: "https://i.pinimg.com/originals/44/26/3f/44263f7426263e2a0ca9d77aa6aae3d8.gif",
+            votes: 0
+          },
+          {
+            id: 3,
+            name: "Ms. Zebra",
+            image: "https://media2.giphy.com/media/20G9uNqE3K4dRjCppA/source.gif",
+            votes: 0
+          },
+          {
+            id: 4,
+            name: "Dr. Lion",
+            image: "https://i.pinimg.com/originals/b5/0f/d7/b50fd77c6d9645526a57ffdd22d73fa3.gif"
+          },
+          {
+            id: 5,
+            name: "Mme. Panda",
+            image: "https://i.pinimg.com/originals/cc/ed/be/ccedbe54dd06be82fb01295ec6074844.gif",
+            votes: 0
+          }
+        ];
+        
+        let currentCharacter = null;
+
+         
+         function saveCharacters() {
+          localStorage.setItem('flatacuties-characters', JSON.stringify(characters));
+        }
+
+       
+        async function init() {
+  
+  const serverCharacters = await fetchCharacters();
+  if (serverCharacters && serverCharacters.length > 0) {
+    characters = serverCharacters;
+  }
+  renderCharacterBar();
+  if (characters.length > 0) {
+    displayCharacterDetails(characters[0].id);
+  }
+}
+
+       
+        function renderCharacterBar() {
+          characterBar.innerHTML = '';
+          characters.forEach(character => {
+            const tab = document.createElement('div');
+            tab.className = 'character-tab';
+            tab.textContent = character.name;
+            tab.dataset.id = character.id;
+            
+            tab.addEventListener('click', () => {
+              displayCharacterDetails(character.id);
+            });
+            
+            characterBar.appendChild(tab);
+          });
+        }
+
+        
+        function displayCharacterDetails(characterId) {
+          const character = characters.find(c => c.id == characterId);
+          if (character) {
+            currentCharacter = character;
+            renderCharacterDetails();
+          }
+        }
+
+       
+        function renderCharacterDetails() {
+          detailedInfo.innerHTML = `
+            <h2>${currentCharacter.name}</h2>
+            <img src="${currentCharacter.image}" alt="${currentCharacter.name}">
+            <h3>Total Votes: <span id="vote-count">${currentCharacter.votes}</span></h3>
+            <form id="votes-form">
+              <input type="number" id="votes-input" placeholder="Enter votes" name="votes" min="1" required>
+              <input type="submit" value="Add Votes">
+              <button type="button" id="reset-btn">Reset Votes</button>
+            </form>
+          `;
+
+
+          
+          
+          document.getElementById('votes-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const votesToAdd = parseInt(document.getElementById('votes-input').value);
+            if (!isNaN(votesToAdd) && votesToAdd > 0) {
+              currentCharacter.votes += votesToAdd;
+              await updateCharacterOnServer(currentCharacter); 
+              saveCharacters();
+              renderCharacterBar();
+              renderCharacterDetails();
+              document.getElementById('votes-input').value = '';
+            }
+          });
+          
+          
+          document.getElementById('reset-btn').addEventListener('click', async function() {
+            currentCharacter.votes = 0;
+            await updateCharacterOnServer(currentCharacter); 
+            document.getElementById('vote-count').textContent = currentCharacter.votes;
+          });
+        }
+
+
+        
+        function getTotalVotes() {
+          return characters.reduce((total, character) => total + character.votes, 0);
+        }
+
+        
+        characterForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          const name = document.getElementById('name').value.trim();
+          const imageUrl = document.getElementById('image-url').value.trim();
+          
+          if (name && imageUrl) {
+            const newId = characters.length > 0 ? Math.max(...characters.map(c => c.id)) + 1 : 1;
+            const newCharacter = {
+              id: newId,
+              name: name,
+              image: imageUrl,
+              votes: 0
+            };
+            
+            characters.push(newCharacter);
+            saveCharacters();
+            renderCharacterBar();
+            displayCharacterDetails(newCharacter.id);
+
+            characterForm.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const name = document.getElementById('name').value.trim();
+  const imageUrl = document.getElementById('image-url').value.trim();
+  
+  if (name && imageUrl) {
+    const newCharacter = {
+      name: name,
+      image: imageUrl,
+      votes: 0
+    };
+    
+    const savedCharacter = await saveCharacterToServer(newCharacter);
+    characters.push(savedCharacter);
+    saveCharacters();
+    renderCharacterBar();
+    displayCharacterDetails(savedCharacter.id);
+    characterForm.reset();
+  }
+});
+            
+          
+            characterForm.reset();
+          }
+        });
+        
+
+        
+        init();
+      });
+    </script>
   </body>
 </html>
