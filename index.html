@@ -130,6 +130,7 @@
     <script>
       const API_URL = 'http://localhost:3000';
 
+
 async function fetchCharacters() {
   try {
     const response = await fetch(`${API_URL}/characters`);
@@ -210,7 +211,7 @@ async function saveCharacterToServer(character) {
           localStorage.setItem('flatacuties-characters', JSON.stringify(characters));
         }
 
-       
+        
         async function init() {
   
   const serverCharacters = await fetchCharacters();
@@ -223,7 +224,7 @@ async function saveCharacterToServer(character) {
   }
 }
 
-       
+        
         function renderCharacterBar() {
           characterBar.innerHTML = '';
           characters.forEach(character => {

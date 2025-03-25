@@ -1,53 +1,97 @@
+body {
+  font-family: Arial, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #e7a15f;
+}
+.logo {
+  text-align: center;
+  margin-bottom: 30px;
+}
 #character-bar {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 15px;
+  padding: 15px;
+  overflow-x: auto;
+  background: #f8f2f2;
+  border-radius: 8px;
+  margin-bottom: 30px;
 }
-#character-bar span {
-  padding: 8px 12px;
-  background-color: #f0f0f0;
-  border-radius: 4px;
+.character-tab {
+  padding: 10px 20px;
+  background: #db3c0b;
+  color: white;
+  border-radius: 5px;
   cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s;
 }
-#character-bar span:hover {
-  background-color: #e0e0e0;
+.character-tab:hover {
+  background: #da67ae;
+  transform: translateY(-2px);
 }
 #detailed-info {
-  margin-top: 20px;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 25px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(231, 132, 178, 0.1);
+  margin-bottom: 30px;
 }
 #detailed-info img {
-  max-width: 200px;
+  max-width: 300px;
   height: auto;
+  border-radius: 8px;
+  margin-bottom: 15px;
 }
-#character-info {
-  margin-top: 20px;
-  padding: 20px;
+#votes-form {
+  margin: 20px 0;
+}
+#votes-form input[type="number"] {
+  padding: 8px;
+  width: 100px;
+  margin-right: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
-#character-info img {
-  max-width: 200px;
-  height: auto;
-}
-#character-item {
-  cursor: pointer;
-  padding: 10px;
-  border: 1px solid #eee;
+#votes-form input[type="submit"],
+#reset-btn {
+  padding: 8px 15px;
+  background: #f57f3b;
+  color: rgb(163, 57, 57);
+  border: none;
   border-radius: 4px;
+  cursor: pointer;
 }
-#character-item:hover {
-  background-color: #f5f5f5;
+#reset-btn {
+  background: #f47c36;
+  margin-left: 10px;
 }
 #character-form {
-  margin-top: 20px;
+  background: #f8f8f8;
   padding: 20px;
+  border-radius: 8px;
+}
+#character-form div {
+  margin-bottom: 15px;
+}
+#character-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+#character-form input[type="text"] {
+  padding: 8px;
+  width: 100%;
+  max-width: 400px;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
-#character-form div {
-  margin-bottom: 10px;
+#character-form input[type="submit"] {
+  padding: 10px 20px;
+  background: #f39121;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
